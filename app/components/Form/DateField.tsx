@@ -24,7 +24,7 @@ export function DateField({
   return (
     <Form.Item
       name={name}
-      label={<span style={{ color: '#050817', fontWeight: 600, fontSize: 14 }}>{label}</span>}
+      label={<span className="text-[#050817] font-semibold text-xs h-2.5">{label}</span>}
       rules={rules}
       style={style}
     >
@@ -35,6 +35,7 @@ export function DateField({
           width: '100%',
           backgroundColor: '#ffffff',
           borderColor: '#ededed',
+          height: 48,
         }}
         disabledDate={disabledDate}
       />

@@ -1,13 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { message } from "antd";
 import { MainLayout } from "@/components/MainLayout";
 import OrderStepOne, { OrderStepOneData } from "@/components/OrderStepOne";
 import OrderStepTwo, { Product } from "@/components/OrderStepTwo";
 import { ordersService } from "@/services/orders.service";
-import { authService } from "@/services/auth.service";
+import { useRouter } from "next/navigation";
 
 const initialStepOneData: OrderStepOneData = {
   direccionRecoleccion: "",
@@ -24,44 +23,20 @@ const initialStepOneData: OrderStepOneData = {
   indicaciones: "",
 };
 
-export default function HomePage() {
+export default function CrearOrden() {
   const router = useRouter();
+  const [activeMenu, setActiveMenu] = useState("crear-orden");
   const [currentStep, setCurrentStep] = useState(1);
   const [stepOneData, setStepOneData] = useState<OrderStepOneData>(initialStepOneData);
   const [products, setProducts] = useState<Product[]>([]);
-  const [userName, setUserName] = useState<string>('');
 
+  // Check if user is authenticated
   useEffect(() => {
-    // Check if user is logged in and redirect appropriately
     const token = localStorage.getItem('accessToken');
-    console.log('Token:', token);
     if (!token) {
       router.push('/iniciar-sesion');
-    } else {
-      // Fetch current user information first, then redirect
-      fetchUserData().then(() => {
-        router.push('/crear-orden');
-      });
     }
   }, [router]);
-
-  const fetchUserData = async () => {
-    try {
-      console.log('Calling authService.getMe()...');
-      const response = await authService.getMe();
-      console.log('getMe response:', response);
-      console.log('Response data:', response.data);
-      
-      if (response.data?.firstName) {
-        console.log('Setting userName to:', response.data.firstName);
-        setUserName(response.data.firstName);
-      } else {
-        console.log('No firstName found in response data');
-      }
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-    }
-  };
 
   const handleStepOneNext = (data: OrderStepOneData) => {
     setStepOneData(data);
@@ -109,41 +84,63 @@ export default function HomePage() {
     }
   };
 
+  const handleMenuSelect = (key: string) => {
+    setActiveMenu(key);
+    if (key === "crear-orden") {
+      // Reset form when navigating to create order
+      setCurrentStep(1);
+      setStepOneData(initialStepOneData);
+      setProducts([]);
+    }
+  };
+
   return (
     <MainLayout 
-      activeMenu="crear-orden"
-      onMenuSelect={() => {}}
+      activeMenu={activeMenu} 
+      onMenuSelect={handleMenuSelect}
       title="Crear un <strong>envío</strong>"
-      userName={userName}
     >
-      <div className="max-w-5xl mx-auto">
-        {/* Page Title */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-[#161734] mb-2">
-            Crea una orden
+      {activeMenu === "crear-orden" && (
+        <div className="max-w-5xl mx-auto">
+          {/* Page Title */}
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-[#161734] mb-2">
+              Crea una orden
+            </h1>
+            <p className="text-[#636060]">
+              Dale una ventaja competitiva a tu negocio con entregas{" "}
+              <strong>el mismo día</strong> (Área Metropolitana) y{" "}
+              <strong>el día siguiente</strong> a nivel nacional.
+            </p>
+          </div>
+
+          {/* Step Content */}
+          {currentStep === 1 ? (
+            <OrderStepOne
+              initialData={stepOneData}
+              onNext={handleStepOneNext}
+            />
+          ) : (
+            <OrderStepTwo
+              products={products}
+              onProductsChange={setProducts}
+              onBack={handleStepTwoBack}
+              onSubmit={handleSubmit}
+            />
+          )}
+        </div>
+      )}
+
+      {activeMenu === "historial" && (
+        <div className="max-w-5xl mx-auto">
+          <h1 className="text-2xl font-bold text-[#161734] mb-4">
+            Historial de órdenes
           </h1>
           <p className="text-[#636060]">
-            Dale una ventaja competitiva a tu negocio con entregas{" "}
-            <strong>el mismo día</strong> (Área Metropolitana) y{" "}
-            <strong>el día siguiente</strong> a nivel nacional.
+            Aquí podrás ver el historial de tus órdenes anteriores.
           </p>
         </div>
-
-        {/* Step Content */}
-        {currentStep === 1 ? (
-          <OrderStepOne
-            initialData={stepOneData}
-            onNext={handleStepOneNext}
-          />
-        ) : (
-          <OrderStepTwo
-            products={products}
-            onProductsChange={setProducts}
-            onBack={handleStepTwoBack}
-            onSubmit={handleSubmit}
-          />
-        )}
-      </div>
+      )}
     </MainLayout>
   );
 }

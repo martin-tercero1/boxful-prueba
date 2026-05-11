@@ -17,7 +17,7 @@ export function ConfirmPasswordField({
   return (
     <Form.Item
       name="repetirContrasena"
-      label={<span style={{ color: '#050817', fontWeight: 600, fontSize: 14 }}>{label}</span>}
+      label={<span className="text-[#050817] font-semibold text-xs h-2.5">{label}</span>}
       dependencies={[passwordFieldName]}
       rules={[
         { required: true, message: 'Repite tu contraseña' },
@@ -33,9 +33,8 @@ export function ConfirmPasswordField({
       style={style}
     >
       <Input.Password
-        prefix={<LockOutlined style={{ color: '#b8b7b7' }} />}
         placeholder={placeholder}
-        style={{ backgroundColor: '#ffffff', borderColor: '#ededed', color: '#050817' }}
+        style={{ backgroundColor: '#ffffff', borderColor: '#ededed', color: '#050817', height: 48 }}
       />
     </Form.Item>
   );

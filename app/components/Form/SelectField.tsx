@@ -20,13 +20,13 @@ export function SelectField({
   return (
     <Form.Item
       name={name}
-      label={<span style={{ color: '#050817', fontWeight: 600, fontSize: 14 }}>{label}</span>}
+      label={<span className="text-[#050817] font-semibold text-xs h-2.5">{label}</span>}
       rules={rules}
       style={style}
     >
       <Select
         placeholder={placeholder}
-        style={{ backgroundColor: '#ffffff' }}
+        style={{ backgroundColor: '#ffffff', height: 48 }}
         options={options}
       />
     </Form.Item>

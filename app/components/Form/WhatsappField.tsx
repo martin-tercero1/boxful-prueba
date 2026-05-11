@@ -12,15 +12,39 @@ const COUNTRY_CODES = [
   { value: '1',   label: '🇺🇸 +1'   },
 ];
 
-export function WhatsAppField() {
+interface WhatsAppFieldProps {
+  countryFieldName?: string;
+  phoneFieldName?: string;
+  label?: string;
+  placeholder?: string;
+  className?: string;
+  style?: React.CSSProperties;
+  phoneRules?: any[];
+  initialCountryCode?: string;
+}
+
+export function WhatsAppField({ 
+  countryFieldName = "codigoPais",
+  phoneFieldName = "whatsapp",
+  label = "Número de whatsapp",
+  placeholder = "7777 7777",
+  className = "",
+  style = { marginBottom: 20 },
+  phoneRules = [
+    { required: true, message: 'Ingresa tu número de WhatsApp' },
+    { pattern: /^\d{7,15}$/, message: 'Ingresa un número válido (solo dígitos, 7-15 caracteres)' },
+  ],
+  initialCountryCode = "505"
+}: WhatsAppFieldProps) {
   return (
     <Form.Item
-      label={<span style={{ color: '#050817', fontWeight: 600, fontSize: 14 }}>Número de whatsapp</span>}
-      style={{ marginBottom: 20 }}
+      label={<span className="text-[#050817] font-semibold text-xs h-2.5">{label}</span>}
+      className={className}
+      style={style}
       required
     >
       <Space.Compact style={{ display: 'flex' }}>
-        <Form.Item name="codigoPais" noStyle initialValue="503">
+        <Form.Item name={countryFieldName} noStyle initialValue={initialCountryCode}>
           <Select
             style={{ width: 110, flexShrink: 0 }}
             options={COUNTRY_CODES}
@@ -28,21 +52,19 @@ export function WhatsAppField() {
           />
         </Form.Item>
         <Form.Item
-          name="whatsapp"
+          name={phoneFieldName}
           noStyle
-          rules={[
-            { required: true, message: 'Ingresa tu número de WhatsApp' },
-            { pattern: /^\d{7,15}$/, message: 'Ingresa un número válido (solo dígitos, 7-15 caracteres)' },
-          ]}
+          rules={phoneRules}
         >
           <Input
-            placeholder="7777 7777"
+            placeholder={placeholder}
             style={{
               flex: 1,
               backgroundColor: '#ffffff',
               borderColor: '#ededed',
               borderLeft: 'none',
               borderRadius: '0 8px 8px 0',
+              height: 48,
             }}
           />
         </Form.Item>

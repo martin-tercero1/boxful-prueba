@@ -43,7 +43,7 @@ export function AuthHeader({ title, subtitle, showBackButton, onBackClick }: Aut
       <Title level={2} style={{ color: '#16163d', fontWeight: 700, marginBottom: 8, fontSize: 'clamp(24px, 3vw, 32px)' }}>
         {title}
       </Title>
-      <Text style={{ color: '#4e4c4c', fontSize: 15, display: 'block', marginBottom: showBackButton ? 32 : 36 }}>
+      <Text style={{ color: '#4e4c4c', fontSize: 16, display: 'block', marginBottom: showBackButton ? 32 : 36 }}>
         {subtitle}
       </Text>
     </>

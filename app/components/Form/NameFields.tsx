@@ -14,7 +14,7 @@ export function NameFields() {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5">
+    <>
       <TextField
         name="nombre"
         label="Nombre"
@@ -27,6 +27,6 @@ export function NameFields() {
         placeholder="Digita tu apellido"
         rules={lastNameRules}
       />
-    </div>
+    </>
   );
 }

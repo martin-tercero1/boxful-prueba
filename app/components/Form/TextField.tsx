@@ -5,8 +5,8 @@ interface TextFieldProps {
   label: string;
   placeholder?: string;
   rules?: any[];
-  style?: React.CSSProperties;
-  inputStyle?: React.CSSProperties;
+  className?: string;
+  inputClassName?: string;
 }
 
 export function TextField({ 
@@ -14,19 +14,19 @@ export function TextField({
   label, 
   placeholder, 
   rules = [],
-  style = { marginBottom: 20 },
-  inputStyle = { backgroundColor: '#ffffff', borderColor: '#ededed' }
+  className = "mb-5",
+  inputClassName = "bg-white border-[#ededed] w-full h-12"
 }: TextFieldProps) {
   return (
     <Form.Item
       name={name}
-      label={<span style={{ color: '#050817', fontWeight: 600, fontSize: 14 }}>{label}</span>}
+      label={<span className="text-[#050817] font-semibold text-xs h-2.5">{label}</span>}
       rules={rules}
-      style={style}
+      className={className}
     >
       <Input
         placeholder={placeholder}
-        style={inputStyle}
+        className={inputClassName}
       />
     </Form.Item>
   );
