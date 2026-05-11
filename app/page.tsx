@@ -1,149 +1,41 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { message } from "antd";
-import { MainLayout } from "@/components/MainLayout";
-import OrderStepOne, { OrderStepOneData } from "@/components/OrderStepOne";
-import OrderStepTwo, { Product } from "@/components/OrderStepTwo";
-import { ordersService } from "@/services/orders.service";
-import { authService } from "@/services/auth.service";
-
-const initialStepOneData: OrderStepOneData = {
-  direccionRecoleccion: "",
-  fechaProgramada: null,
-  nombres: "",
-  apellidos: "",
-  correoElectronico: "",
-  codigoPais: "503",
-  telefono: "",
-  direccionDestinatario: "",
-  departamento: "",
-  municipio: "",
-  puntoReferencia: "",
-  indicaciones: "",
-};
 
 export default function HomePage() {
   const router = useRouter();
-  const [currentStep, setCurrentStep] = useState(1);
-  const [stepOneData, setStepOneData] = useState<OrderStepOneData>(initialStepOneData);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [userName, setUserName] = useState<string>('');
 
   useEffect(() => {
-    // Check if user is logged in and redirect appropriately
-    const token = localStorage.getItem('accessToken');
-    console.log('Token:', token);
-    if (!token) {
-      router.push('/iniciar-sesion');
-    } else {
-      // Fetch current user information first, then redirect
-      fetchUserData().then(() => {
+    const handleAuthentication = async () => {
+      const token = localStorage.getItem('accessToken');
+      
+      if (!token) {
+        router.push('/iniciar-sesion');
+        return;
+      }
+
+      try {
+        // Redirect authenticated users to create order page
         router.push('/crear-orden');
-      });
-    }
+      } catch (error) {
+        console.error('Token validation failed:', error);
+        // Clear invalid token and redirect to login
+        localStorage.removeItem('accessToken');
+        router.push('/iniciar-sesion');
+      }
+    };
+
+    handleAuthentication();
   }, [router]);
 
-  const fetchUserData = async () => {
-    try {
-      console.log('Calling authService.getMe()...');
-      const response = await authService.getMe();
-      console.log('getMe response:', response);
-      console.log('Response data:', response.data);
-      
-      if (response.data?.firstName) {
-        console.log('Setting userName to:', response.data.firstName);
-        setUserName(response.data.firstName);
-      } else {
-        console.log('No firstName found in response data');
-      }
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-    }
-  };
-
-  const handleStepOneNext = (data: OrderStepOneData) => {
-    setStepOneData(data);
-    setCurrentStep(2);
-  };
-
-  const handleStepTwoBack = () => {
-    setCurrentStep(1);
-  };
-
-  const handleSubmit = async () => {
-    try {
-      const orderData = {
-        pickUpAddress: stepOneData.direccionRecoleccion,
-        scheduledDate: stepOneData.fechaProgramada?.toISOString() || '',
-        firstNames: stepOneData.nombres,
-        lastNames: stepOneData.apellidos,
-        email: stepOneData.correoElectronico,
-        phoneNumber: `${stepOneData.codigoPais}${stepOneData.telefono}`,
-        destinationAddress: stepOneData.direccionDestinatario,
-        department: stepOneData.departamento,
-        municipality: stepOneData.municipio,
-        referencePoint: stepOneData.puntoReferencia,
-        indications: stepOneData.indicaciones,
-        cashOnDelivery: false,
-        products: products.map(p => ({
-          height: parseFloat(p.alto) || 0,
-          length: parseFloat(p.largo) || 0,
-          width: parseFloat(p.ancho) || 0,
-          weight: parseFloat(p.pesoLibras) || 0,
-          content: p.contenido
-        })),
-      };
-      
-      await ordersService.create(orderData);
-      message.success("¡Orden creada exitosamente!");
-      
-      // Reset form after successful submission
-      setCurrentStep(1);
-      setStepOneData(initialStepOneData);
-      setProducts([]);
-    } catch (error) {
-      console.error("Error creating order:", error);
-      message.error("Error al crear la orden. Por favor intenta nuevamente.");
-    }
-  };
-
+  // Show loading state while redirecting
   return (
-    <MainLayout 
-      activeMenu="crear-orden"
-      onMenuSelect={() => {}}
-      title="Crear un <strong>envío</strong>"
-      userName={userName}
-    >
-      <div className="max-w-5xl mx-auto">
-        {/* Page Title */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-[#161734] mb-2">
-            Crea una orden
-          </h1>
-          <p className="text-[#636060]">
-            Dale una ventaja competitiva a tu negocio con entregas{" "}
-            <strong>el mismo día</strong> (Área Metropolitana) y{" "}
-            <strong>el día siguiente</strong> a nivel nacional.
-          </p>
-        </div>
-
-        {/* Step Content */}
-        {currentStep === 1 ? (
-          <OrderStepOne
-            initialData={stepOneData}
-            onNext={handleStepOneNext}
-          />
-        ) : (
-          <OrderStepTwo
-            products={products}
-            onProductsChange={setProducts}
-            onBack={handleStepTwoBack}
-            onSubmit={handleSubmit}
-          />
-        )}
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <p className="text-gray-600">Redirigiendo...</p>
       </div>
-    </MainLayout>
+    </div>
   );
 }

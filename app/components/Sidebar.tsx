@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { Menu, Button, Drawer } from "antd";
-import { PlusOutlined, FileSearchOutlined, MenuOutlined } from "@ant-design/icons";
+import { PlusOutlined, FileSearchOutlined, MenuOutlined, LogoutOutlined } from "@ant-design/icons";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { authService } from "@/services/auth.service";
 
 interface SidebarProps {
   activeKey: string;
@@ -22,14 +24,27 @@ const SidebarContent = ({
 }: {
   activeKey: string;
   onMenuSelect: (key: string) => void;
-}) => (
-  <div className="flex flex-col h-full p-10">
-    <BoxfulLogo />
-    <div className="py-8">
-      <span className="text-sm font-semibold text-[#161734] uppercase tracking-wider">
-        MENÚ
-      </span>
-    </div>
+}) => {
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await authService.logout();
+      router.push('/iniciar-sesion');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
+  return (
+    <>
+    <div className="flex flex-col h-full p-10">
+      <BoxfulLogo />
+      <div className="py-8">
+        <span className="text-sm font-semibold text-[#161734] uppercase tracking-wider">
+          MENÚ
+        </span>
+      </div>
       <Button
         type={activeKey === "crear-orden" ? "primary" : "default"}
         icon={<PlusOutlined />}
@@ -59,16 +74,38 @@ const SidebarContent = ({
           key: "historial",
           icon: <FileSearchOutlined />,
           label: "Historial",
-          className: `rounded-lg h-18 text-base ${
-            activeKey === "historial" 
-              ? "bg-[#2e49ce] text-white" 
-              : "bg-white text-[#161734]"
-          }`,
+          style: {
+            borderRadius: "8px",
+            height: "72px",
+            fontSize: "16px",
+            backgroundColor: activeKey === "historial" ? "#2e49ce" : "#ffffff",
+            color: activeKey === "historial" ? "#ffffff" : "#161734",
+            marginBottom: "8px"
+          }
         }
       ]}
     />
   </div>
+  <div className="mt-auto p-4">
+    <Button
+      type="default"
+      icon={<LogoutOutlined />}
+      onClick={handleLogout}
+      className="w-full flex items-center justify-center h-12"
+      style={{
+        borderRadius: "8px",
+        border: "1px solid #e1e9e8",
+        backgroundColor: "#ffffff",
+        color: "#ef4444",
+        height: "48px"
+      }}
+    >
+      Cerrar sesión
+    </Button>
+  </div>
+  </>
 );
+}
 
 export default function Sidebar({ activeKey, onMenuSelect }: SidebarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);

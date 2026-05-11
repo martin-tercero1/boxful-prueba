@@ -7,6 +7,7 @@ import OrderStepOne, { OrderStepOneData } from "@/components/OrderStepOne";
 import OrderStepTwo, { Product } from "@/components/OrderStepTwo";
 import { ordersService } from "@/services/orders.service";
 import { useRouter } from "next/navigation";
+import { authService } from "@/services/auth.service";
 
 const initialStepOneData: OrderStepOneData = {
   direccionRecoleccion: "",
@@ -29,6 +30,7 @@ export default function CrearOrden() {
   const [currentStep, setCurrentStep] = useState(1);
   const [stepOneData, setStepOneData] = useState<OrderStepOneData>(initialStepOneData);
   const [products, setProducts] = useState<Product[]>([]);
+  const [userName, setUserName] = useState("");
 
   // Check if user is authenticated
   useEffect(() => {
@@ -36,6 +38,9 @@ export default function CrearOrden() {
     if (!token) {
       router.push('/iniciar-sesion');
     }
+    authService.getMe().then((response) => {
+      setUserName(`${response.data.firstName} ${response.data.lastName}`);
+    });
   }, [router]);
 
   const handleStepOneNext = (data: OrderStepOneData) => {
@@ -99,6 +104,7 @@ export default function CrearOrden() {
       activeMenu={activeMenu} 
       onMenuSelect={handleMenuSelect}
       title="Crear un <strong>envío</strong>"
+      userName={userName}
     >
       {activeMenu === "crear-orden" && (
         <div className="max-w-5xl mx-auto">

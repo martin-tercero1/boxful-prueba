@@ -12,7 +12,7 @@ export default function Header({ title, userName }: HeaderProps) {
         className="text-xl font-medium text-[#161734]" 
         dangerouslySetInnerHTML={{ __html: title }}
       />
-      <div className="text-[#161734] font-medium">{userName}</div>
+      {userName && <div className="text-[#161734] text-[22px] font-medium">{userName}</div>}
     </header>
   );
 }
