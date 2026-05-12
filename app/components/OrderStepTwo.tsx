@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
-import { Form, Input, Button, Card, Row, Col, message } from "antd";
+import { Form, Input, Button, Card, Row, Col, message, InputNumber } from "antd";
 import {
   ArrowLeftOutlined,
   ArrowRightOutlined,
@@ -12,10 +11,10 @@ import {
 
 export interface Product {
   id: string;
-  largo: string;
-  alto: string;
-  ancho: string;
-  pesoLibras: string;
+  largo: number;
+  alto: number;
+  ancho: number;
+  pesoLibras: number;
   contenido: string;
 }
 
@@ -24,6 +23,7 @@ interface OrderStepTwoProps {
   onProductsChange: (products: Product[]) => void;
   onBack: () => void;
   onSubmit: () => void;
+  isSubmitting?: boolean;
 }
 
 const BoxIcon = () => (
@@ -40,6 +40,7 @@ export default function OrderStepTwo({
   onProductsChange,
   onBack,
   onSubmit,
+  isSubmitting,
 }: OrderStepTwoProps) {
   const [form] = Form.useForm();
 
@@ -47,10 +48,10 @@ export default function OrderStepTwo({
     form.validateFields().then((values) => {
       const newProduct: Product = {
         id: Date.now().toString(),
-        largo: values.largo,
-        alto: values.alto,
-        ancho: values.ancho,
-        pesoLibras: values.pesoLibras,
+        largo: values.largo || 0,
+        alto: values.alto || 0,
+        ancho: values.ancho || 0,
+        pesoLibras: values.pesoLibras || 0,
         contenido: values.contenido,
       };
       onProductsChange([...products, newProduct]);
@@ -93,10 +94,13 @@ export default function OrderStepTwo({
                 name="largo"
                 rules={[{ required: true, message: "Requerido" }]}
               >
-                <Input
-                  suffix={<span className="text-[#acb3c5]">cm</span>}
+                <InputNumber
+                  min={0}
+                  precision={2}
                   placeholder="0"
-                  style={{ height: "48px", borderRadius: "8px", borderColor: "#d9d9d9" }}
+                  suffix={<span className="text-[#acb3c5]">cm</span>}
+                  style={{ height: "48px", borderRadius: "8px", borderColor: "#d9d9d9", width: "100%" }}
+                  controls={false}
                 />
               </Form.Item>
             </Col>
@@ -110,10 +114,13 @@ export default function OrderStepTwo({
                 name="alto"
                 rules={[{ required: true, message: "Requerido" }]}
               >
-                <Input
-                  suffix={<span className="text-[#acb3c5]">cm</span>}
+                <InputNumber
+                  min={0}
+                  precision={2}
                   placeholder="0"
-                  style={{ height: "48px", borderRadius: "8px", borderColor: "#d9d9d9" }}
+                  suffix={<span className="text-[#acb3c5]">cm</span>}
+                  style={{ height: "48px", borderRadius: "8px", borderColor: "#d9d9d9", width: "100%" }}
+                  controls={false}
                 />
               </Form.Item>
             </Col>
@@ -127,10 +134,13 @@ export default function OrderStepTwo({
                 name="ancho"
                 rules={[{ required: true, message: "Requerido" }]}
               >
-                <Input
-                  suffix={<span className="text-[#acb3c5]">cm</span>}
+                <InputNumber
+                  min={0}
+                  precision={2}
                   placeholder="0"
-                  style={{ height: "48px", borderRadius: "8px", borderColor: "#d9d9d9" }}
+                  suffix={<span className="text-[#acb3c5]">cm</span>}
+                  style={{ height: "48px", borderRadius: "8px", borderColor: "#d9d9d9", width: "100%" }}
+                  controls={false}
                 />
               </Form.Item>
             </Col>
@@ -144,10 +154,13 @@ export default function OrderStepTwo({
                 name="pesoLibras"
                 rules={[{ required: true, message: "Requerido" }]}
               >
-                <Input
+                <InputNumber
+                  min={0}
+                  precision={2}
                   placeholder="0"
                   suffix={<span className="text-[#acb3c5]">libras</span>}
-                  style={{ height: "48px", borderRadius: "8px", borderColor: "#d9d9d9" }}
+                  style={{ height: "48px", borderRadius: "8px", borderColor: "#d9d9d9", width: "100%" }}
+                  controls={false}
                 />
               </Form.Item>
             </Col>
@@ -210,16 +223,18 @@ export default function OrderStepTwo({
                   <span className="text-xs text-[#050817] block mb-1 font-semibold">
                     Peso en libras
                   </span>
-                  <Input
+                  <InputNumber
                     value={product.pesoLibras}
-                    onChange={(e) => {
+                    onChange={(value) => {
                       const updatedProducts = products.map((p) => 
-                        p.id === product.id ? { ...p, pesoLibras: e.target.value } : p
+                        p.id === product.id ? { ...p, pesoLibras: value || 0 } : p
                       );
                       onProductsChange(updatedProducts);
                     }}
-                    style={{ height: "48px", borderRadius: "8px", borderColor: "#d9d9d9" }}
+                    style={{ height: "48px", borderRadius: "8px", borderColor: "#d9d9d9", width: "100%" }}
                     suffix={<span className="text-[#acb3c5]">libras</span>}
+                    precision={2}
+                    controls={false}
                   />
                 </div>
               </Col>
@@ -248,16 +263,18 @@ export default function OrderStepTwo({
                   <span className="text-sm text-[#050817] block mb-1 font-semibold">
                     Largo
                   </span>
-                  <Input
+                  <InputNumber
                     value={product.largo}
-                    onChange={(e) => {
+                    onChange={(value) => {
                       const updatedProducts = products.map((p) => 
-                        p.id === product.id ? { ...p, largo: e.target.value } : p
+                        p.id === product.id ? { ...p, largo: value || 0 } : p
                       );
                       onProductsChange(updatedProducts);
                     }}
                     suffix={<span className="text-[#acb3c5]">cm</span>}
-                    style={{ height: "48px", borderRadius: "8px", borderColor: "#d9d9d9" }}
+                    style={{ height: "48px", borderRadius: "8px", borderColor: "#d9d9d9", width: "100%" }}
+                    precision={2}
+                    controls={false}
                   />
                 </div>
               </Col>
@@ -266,16 +283,18 @@ export default function OrderStepTwo({
                   <span className="text-sm text-[#050817] block mb-1 font-semibold">
                     Alto
                   </span>
-                  <Input
+                  <InputNumber
                     value={product.alto}
-                    onChange={(e) => {
+                    onChange={(value) => {
                       const updatedProducts = products.map((p) => 
-                        p.id === product.id ? { ...p, alto: e.target.value } : p
+                        p.id === product.id ? { ...p, alto: value || 0 } : p
                       );
                       onProductsChange(updatedProducts);
                     }}
                     suffix={<span className="text-[#acb3c5]">cm</span>}
-                    style={{ height: "48px", borderRadius: "8px", borderColor: "#d9d9d9" }}
+                    style={{ height: "48px", borderRadius: "8px", borderColor: "#d9d9d9", width: "100%" }}
+                    precision={2}
+                    controls={false}
                   />
                 </div>
               </Col>
@@ -284,16 +303,18 @@ export default function OrderStepTwo({
                   <span className="text-sm text-[#050817] block mb-1 font-semibold">
                     Ancho
                   </span>
-                  <Input
+                  <InputNumber
                     value={product.ancho}
-                    onChange={(e) => {
+                    onChange={(value) => {
                       const updatedProducts = products.map((p) => 
-                        p.id === product.id ? { ...p, ancho: e.target.value } : p
+                        p.id === product.id ? { ...p, ancho: value || 0 } : p
                       );
                       onProductsChange(updatedProducts);
                     }}
                     suffix={<span className="text-[#acb3c5]">cm</span>}
-                    style={{ height: "48px", borderRadius: "8px", borderColor: "#d9d9d9" }}
+                    style={{ height: "48px", borderRadius: "8px", borderColor: "#d9d9d9", width: "100%" }}
+                    precision={2}
+                    controls={false}
                   />
                 </div>
               </Col>
@@ -339,23 +360,19 @@ export default function OrderStepTwo({
           icon={<ArrowRightOutlined />}
           iconPlacement="end"
           onClick={onSubmit}
-          disabled={products.length === 0}
+          disabled={products.length === 0 || isSubmitting}
+          loading={isSubmitting}
           style={{ 
-            backgroundColor: "#2e49ce", 
             height: "44px", 
             paddingLeft: "24px", 
             paddingRight: "24px", 
-            borderRadius: "6px",
-            opacity: products.length === 0 ? 0.6 : 1
-          }}
-          onMouseEnter={(e) => {
-            if (products.length > 0) e.currentTarget.style.backgroundColor = "#1e39be";
-          }}
-          onMouseLeave={(e) => {
-            if (products.length > 0) e.currentTarget.style.backgroundColor = "#2e49ce";
+            borderRadius: "6px", 
+            borderColor: "#2e49ce", 
+            color: "#ffffff",
+            backgroundColor: "#2e49ce"
           }}
         >
-          Enviar
+          Enviar orden
         </Button>
       </div>
     </Card>

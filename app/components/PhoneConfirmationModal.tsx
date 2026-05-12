@@ -1,5 +1,5 @@
 import { Modal, Button } from 'antd';
-import { CloseOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import Image from 'next/image';
 
 interface PhoneConfirmationModalProps {
   visible: boolean;
@@ -28,11 +28,18 @@ export default function PhoneConfirmationModal({
       <div className="text-center h-full">
 
         {/* Warning icon and title */}
-        <div className="flex justify-center mb-4">
-          <ExclamationCircleOutlined 
-            className="text-yellow-500" 
-            style={{ fontSize: '48px' }} 
-          />
+        <div className="flex justify-center mb-6">
+          <div 
+            className="w-24 h-24 rounded-full flex items-center justify-center"
+            style={{ backgroundColor: '#FFF6E8' }}
+          >
+            <Image
+              src="/images/warning.svg"
+              alt="Warning"
+              width={56}
+              height={56}
+            />
+          </div>
         </div>
         
         <h3 className="text-[20px] text-[#161734] mb-2">

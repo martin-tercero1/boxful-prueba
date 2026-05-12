@@ -8,6 +8,8 @@ import { DateField } from "./Form/DateField";
 import { EmailField } from "./Form/EmailField";
 import { SelectField } from "./Form/SelectField";
 import { WhatsAppField } from "./Form/WhatsappField";
+import CashOnDeliverySection from "./CashOnDeliverySection";
+import type { CashOnDeliveryData } from "@/types/order.types";
 
 export interface OrderStepOneData {
   direccionRecoleccion: string;
@@ -22,27 +24,22 @@ export interface OrderStepOneData {
   municipio: string;
   puntoReferencia: string;
   indicaciones: string;
+  cashOnDelivery: boolean;
+  cashAmount: number | undefined;
 }
 
 interface OrderStepOneProps {
   initialData: OrderStepOneData;
   onNext: (data: OrderStepOneData) => void;
+  cashOnDeliveryData: CashOnDeliveryData;
+  onCashOnDeliveryChange: (data: CashOnDeliveryData) => void;
 }
-
-const countryCodes = [
-  { value: "503", label: "503" },
-  { value: "502", label: "502" },
-  { value: "504", label: "504" },
-  { value: "505", label: "505" },
-  { value: "506", label: "506" },
-  { value: "507", label: "507" },
-  { value: "52", label: "52" },
-  { value: "1", label: "1" },
-];
 
 export default function OrderStepOne({
   initialData,
   onNext,
+  cashOnDeliveryData,
+  onCashOnDeliveryChange,
 }: OrderStepOneProps) {
   const [form] = Form.useForm();
 
@@ -132,7 +129,7 @@ export default function OrderStepOne({
               phoneRules={[
                 { required: true, message: "Este campo es requerido" },
               ]}
-              initialCountryCode="503"
+              initialCountryCode="505"
             />
           </Col>
           <Col xs={24} md={16}>
@@ -192,6 +189,12 @@ export default function OrderStepOne({
             />
           </Col>
         </Row>
+
+      {/* Cash on Delivery Section */}
+      <CashOnDeliverySection
+        data={cashOnDeliveryData}
+        onChange={onCashOnDeliveryChange}
+      />
 
         <div className="flex justify-end mt-6">
           <Button

@@ -7,4 +7,7 @@ export const ordersService = {
 
   getAll: (filters?: OrderFilters) =>
     api.get('/orders', { params: filters }),
+
+  calculateForUser: () =>
+    api.get('/orders/settlement'),
 };

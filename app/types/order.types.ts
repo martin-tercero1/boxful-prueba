@@ -31,3 +31,30 @@ export interface OrderFilters {
   page?: number;
   limit?: number;
 }
+
+export interface CashOnDeliveryData {
+  cashOnDelivery: boolean;
+  cashAmount?: number;
+}
+
+export interface Order {
+  id: string;
+  reference: string;
+  firstNames: string;
+  lastNames: string;
+  department: string;
+  municipality: string;
+  products: Product[];
+  createdAt: string;
+  pickUpAddress: string;
+  scheduledDate: string;
+  email: string;
+  phoneNumber: string;
+  destinationAddress: string;
+  referencePoint: string;
+  indications: string;
+  cashOnDelivery: boolean;
+  cashAmount?: number;
+  updatedAt?: string;
+  userId?: string;
+}

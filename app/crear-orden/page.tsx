@@ -8,6 +8,9 @@ import OrderStepTwo, { Product } from "@/components/OrderStepTwo";
 import { ordersService } from "@/services/orders.service";
 import { useRouter } from "next/navigation";
 import { authService } from "@/services/auth.service";
+import OrderHistory from '@/components/OrderHistory';
+import type { CashOnDeliveryData } from '@/types/order.types';
+import OrderSuccessModal from "@/components/OrderSuccessModal";
 
 const initialStepOneData: OrderStepOneData = {
   direccionRecoleccion: "",
@@ -15,13 +18,15 @@ const initialStepOneData: OrderStepOneData = {
   nombres: "",
   apellidos: "",
   correoElectronico: "",
-  codigoPais: "503",
+  codigoPais: "505",
   telefono: "",
   direccionDestinatario: "",
   departamento: "",
   municipio: "",
   puntoReferencia: "",
   indicaciones: "",
+  cashOnDelivery: true,
+  cashAmount: undefined,
 };
 
 export default function CrearOrden() {
@@ -30,6 +35,12 @@ export default function CrearOrden() {
   const [currentStep, setCurrentStep] = useState(1);
   const [stepOneData, setStepOneData] = useState<OrderStepOneData>(initialStepOneData);
   const [products, setProducts] = useState<Product[]>([]);
+  const [cashOnDeliveryData, setCashOnDeliveryData] = useState<CashOnDeliveryData>({
+    cashOnDelivery: false,
+    cashAmount: undefined,
+  });
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [userName, setUserName] = useState("");
 
   // Check if user is authenticated
@@ -54,6 +65,7 @@ export default function CrearOrden() {
 
   const handleSubmit = async () => {
     try {
+      setIsSubmitting(true);
       const orderData = {
         pickUpAddress: stepOneData.direccionRecoleccion,
         scheduledDate: stepOneData.fechaProgramada?.toISOString() || '',
@@ -66,44 +78,62 @@ export default function CrearOrden() {
         municipality: stepOneData.municipio,
         referencePoint: stepOneData.puntoReferencia,
         indications: stepOneData.indicaciones,
-        cashOnDelivery: false,
+        cashOnDelivery: cashOnDeliveryData.cashOnDelivery,
+        cashAmount: cashOnDeliveryData.cashAmount,
         products: products.map(p => ({
-          height: parseFloat(p.alto) || 0,
-          length: parseFloat(p.largo) || 0,
-          width: parseFloat(p.ancho) || 0,
-          weight: parseFloat(p.pesoLibras) || 0,
+          height: p.alto || 0,
+          length: p.largo || 0,
+          width: p.ancho || 0,
+          weight: p.pesoLibras || 0,
           content: p.contenido
         })),
       };
       
       await ordersService.create(orderData);
-      message.success("¡Orden creada exitosamente!");
-      
-      // Reset form after successful submission
-      setCurrentStep(1);
-      setStepOneData(initialStepOneData);
-      setProducts([]);
+      setShowSuccessModal(true);
     } catch (error) {
       console.error("Error creating order:", error);
       message.error("Error al crear la orden. Por favor intenta nuevamente.");
+    } finally {
+      setIsSubmitting(false);
     }
+  };
+
+  const resetForm = () => {
+    setCurrentStep(1);
+    setStepOneData(initialStepOneData);
+    setProducts([]);
+    setCashOnDeliveryData({ cashOnDelivery: false, cashAmount: undefined });
+  };
+
+  const handleCreateAnother = () => {
+    setShowSuccessModal(false);
+    resetForm();
+  };
+
+  const handleGoHome = () => {
+    setShowSuccessModal(false);
+    resetForm();
+    setActiveMenu("historial");
   };
 
   const handleMenuSelect = (key: string) => {
     setActiveMenu(key);
     if (key === "crear-orden") {
       // Reset form when navigating to create order
-      setCurrentStep(1);
-      setStepOneData(initialStepOneData);
-      setProducts([]);
+      resetForm();
     }
   };
 
+  const pageTitle = activeMenu === "historial" 
+    ? "Mis <strong>envíos</strong>" 
+    : "Crear un <strong>envío</strong>";
+    
   return (
     <MainLayout 
       activeMenu={activeMenu} 
       onMenuSelect={handleMenuSelect}
-      title="Crear un <strong>envío</strong>"
+      title={pageTitle}
       userName={userName}
     >
       {activeMenu === "crear-orden" && (
@@ -125,6 +155,8 @@ export default function CrearOrden() {
             <OrderStepOne
               initialData={stepOneData}
               onNext={handleStepOneNext}
+              cashOnDeliveryData={cashOnDeliveryData}
+              onCashOnDeliveryChange={setCashOnDeliveryData}
             />
           ) : (
             <OrderStepTwo
@@ -132,21 +164,25 @@ export default function CrearOrden() {
               onProductsChange={setProducts}
               onBack={handleStepTwoBack}
               onSubmit={handleSubmit}
+              isSubmitting={isSubmitting}
             />
           )}
         </div>
       )}
 
       {activeMenu === "historial" && (
-        <div className="max-w-5xl mx-auto">
-          <h1 className="text-2xl font-bold text-[#161734] mb-4">
-            Historial de órdenes
-          </h1>
-          <p className="text-[#636060]">
-            Aquí podrás ver el historial de tus órdenes anteriores.
-          </p>
+        <div className="w-full">
+          <OrderHistory />
         </div>
       )}
+
+      {/* Success Modal */}
+      <OrderSuccessModal
+        visible={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        onCreateAnother={handleCreateAnother}
+        onGoHome={handleGoHome}
+      />
     </MainLayout>
   );
 }
