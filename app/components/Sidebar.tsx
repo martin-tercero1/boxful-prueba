@@ -48,7 +48,7 @@ const SidebarContent = ({
       <Button
         type={activeKey === "crear-orden" ? "primary" : "default"}
         icon={<PlusOutlined />}
-        onClick={() => onMenuSelect("crear-orden")}
+        onClick={() => router.push('/crear-orden')}
         className="w-full flex items-center justify-start h-12"
         style={{
           borderRadius: "8px",
