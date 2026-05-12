@@ -64,7 +64,13 @@ const SidebarContent = ({
     <Menu
       mode="inline"
       selectedKeys={[activeKey]}
-      onClick={({ key }) => onMenuSelect(key)}
+      onClick={({ key }) => {
+        if (key === "historial") {
+          router.push('/historial');
+        } else {
+          onMenuSelect(key);
+        }
+      }}
       className="border-none bg-transparent"
       style={{
         margin: 0
